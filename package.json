@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@wdk/account-abstraction-evm": "https://github.com/itsdeka/wdk-account-abstraction-evm",
-    "@wdk/account-abstraction-ton": "https://github.com/itsdeka/wdk-account-abstraction-ton-main#dFix",
+    "@wdk/account-abstraction-ton": "https://github.com/itsdeka/wdk-account-abstraction-ton-main#dfix",
     "@wdk/wallet-evm": "https://github.com/davi0kprogramsthings/wdk-wallet-evm",
     "@wdk/wallet-ton": "https://github.com/davi0kprogramsthings/wdk-wallet-ton",
     "bip39": "^3.1.0"

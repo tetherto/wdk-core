@@ -9,7 +9,7 @@
     "lint": "standard --fix"
   },
   "dependencies": {
-    "@wdk/account-abstraction-evm": "https://github.com/davi0kprogramsthings/wdk-account-abstraction-evm",
+    "@wdk/account-abstraction-evm": "https://github.com/itsdeka/wdk-account-abstraction-evm",
     "@wdk/account-abstraction-ton": "https://github.com/davi0kprogramsthings/wdk-account-abstraction-ton",
     "@wdk/wallet-evm": "https://github.com/davi0kprogramsthings/wdk-wallet-evm",
     "@wdk/wallet-ton": "https://github.com/davi0kprogramsthings/wdk-wallet-ton",

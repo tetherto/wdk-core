@@ -13,22 +13,4 @@
 // limitations under the License.
 'use strict'
 
-/** @typedef {import('./src/wdk-manager.js').Seeds} Seeds */
-
-/** @typedef {import('./src/wdk-manager.js').WdkConfig} WdkConfig */
-
-/** @typedef {import('./src/wdk-manager.js').TransferOptions} TransferOptions */
-/** @typedef {import('./src/wdk-manager.js').TransferConfig} TransferConfig */
-/** @typedef {import('./src/wdk-manager.js').TransferResult} TransferResult */
-
-/** @typedef {import('./src/wdk-manager.js').SwapOptions} SwapOptions */
-/** @typedef {import('./src/wdk-manager.js').SwapConfig} SwapConfig */
-/** @typedef {import('./src/wdk-manager.js').SwapResult} SwapResult */
-
-/** @typedef {import('./src/wdk-manager.js').BridgeOptions} BridgeOptions */
-/** @typedef {import('./src/wdk-manager.js').BridgeConfig} BridgeConfig */
-/** @typedef {import('./src/wdk-manager.js').BridgeResult} BridgeResult */
-
-/** @typedef {import('./src/wallet-account.js').default} IWalletAccount */
-
 export { default, Blockchain } from './src/wdk-manager.js'

@@ -9,6 +9,7 @@ export namespace Blockchain {
     let Ton: string;
     let Bitcoin: string;
     let Spark: string;
+    let Tron: string;
 }
 export default class WdkManager {
     /**
@@ -38,6 +39,10 @@ export default class WdkManager {
      * @param {WdkConfig} config - The configuration for each blockchain.
      */
     constructor(seed: string | Seeds, config: WdkConfig);
+    _seed: any;
+    _config: WdkConfig;
+    _wallets: {};
+    _cache: {};
     /**
      * Returns the wallet account for a specific blockchain and index (see [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)).
      *
@@ -71,42 +76,17 @@ export default class WdkManager {
         fast: number;
     }>;
     /**
-     * Returns the abstracted address of an account.
+     * Returns the address of an account.
      *
      * @param {Blockchain} blockchain - A blockchain identifier (e.g., "ethereum").
      * @param {number} accountIndex - The index of the account to use (see [BIP-44](https://en.bitcoin.it/wiki/BIP_0044)).
-     * @returns {Promise<string>} The abstracted address.
+     * @returns {Promise<string>} The address.
      *
      * @example
-     * // Get the abstracted address of the ethereum wallet's account at m/44'/60'/0'/0/3
-     * const abstractedAddress = await wdk.getAbstractedAddress("ethereum", 3);
+     * // Get the address of the ethereum wallet's account at m/44'/60'/0'/0/3
+     * const address = await wdk.getAddress("ethereum", 3);
      */
-    getAbstractedAddress(blockchain: Blockchain, accountIndex: number): Promise<string>;
-    /**
-     * Returns the native token balance of an abstracted address.
-     *
-     * @param {Blockchain} blockchain - A blockchain identifier (e.g., "ethereum").
-     * @param {number} accountIndex - The index of the account to use (see [BIP-44](https://en.bitcoin.it/wiki/BIP_0044)).
-     * @returns {Promise<number>} The native token balance (in base unit).
-     */
-    getAbstractedAddressBalance(blockchain: Blockchain, accountIndex: number): Promise<number>;
-    /**
-     * Returns the balance of an abstracted address for a specific token.
-     *
-     * @param {Blockchain} blockchain - A blockchain identifier (e.g., "ethereum").
-     * @param {number} accountIndex - The index of the account to use (see [BIP-44](https://en.bitcoin.it/wiki/BIP_0044)).
-     * @param {string} tokenAddress - The smart contract address of the token
-     * @returns {Promise<number>} The token balance (in base unit).
-     */
-    getAbstractedAddressTokenBalance(blockchain: Blockchain, accountIndex: number, tokenAddress: string): Promise<number>;
-    /**
-     * Returns the paymaster token balance of an abstracted address.
-     *
-     * @param {Blockchain} blockchain - A blockchain identifier (e.g., "ethereum").
-     * @param {number} accountIndex - The index of the account to use (see [BIP-44](https://en.bitcoin.it/wiki/BIP_0044)).
-     * @returns {Promise<number>} The paymaster token balance (in base unit).
-     */
-    getAbstractedAddressPaymasterTokenBalance(blockchain: Blockchain, accountIndex: number): Promise<number>;
+    getAddress(blockchain: Blockchain, accountIndex: number): Promise<string>;
     /**
      * Transfers a token to another address.
      *
@@ -148,234 +128,5 @@ export default class WdkManager {
      * console.log("Gas cost in paymaster token:", quote.gasCost);
      */
     quoteTransfer(blockchain: Blockchain, accountIndex: number, options: TransferOptions, config?: TransferConfig): Promise<Omit<TransferResult, "hash">>;
-    /**
-     * Swaps a pair of tokens.
-     *
-     * @param {Blockchain} blockchain - A blockchain identifier (e.g., "ethereum").
-     * @param {number} accountIndex - The index of the account to use (see [BIP-44](https://en.bitcoin.it/wiki/BIP_0044)).
-     * @param {SwapOptions} options - The swap's options.
-     * @param {SwapConfig} [config] - If set, overrides the 'swapMaxFee' and 'paymasterToken' options defined in the manager configuration.
-     * @returns {Promise<SwapResult>} The swap's result.
-     */
-    swap(blockchain: Blockchain, accountIndex: number, options: SwapOptions, config?: SwapConfig): Promise<SwapResult>;
-    /**
-     * Quotes the costs of a swap operation.
-     *
-     * @see {@link swap}
-     * @param {Blockchain} blockchain - A blockchain identifier (e.g., "ethereum").
-     * @param {number} accountIndex - The index of the account to use (see [BIP-44](https://en.bitcoin.it/wiki/BIP_0044)).
-     * @param {SwapOptions} options - The swap's options.
-     * @param {SwapConfig} [config] - If set, overrides the 'swapMaxFee' and 'paymasterToken' options defined in the manager configuration.
-     * @returns {Promise<Omit<SwapResult, 'hash'>>} The swap's quotes.
-     */
-    quoteSwap(blockchain: Blockchain, accountIndex: number, options: SwapOptions, config?: SwapConfig): Promise<Omit<SwapResult, "hash">>;
-    /**
-     * Bridges usdt tokens to a different blockchain.
-     *
-     * @param {Blockchain} blockchain - A blockchain identifier (e.g., "ethereum").
-     * @param {number} accountIndex - The index of the account to use (see [BIP-44](https://en.bitcoin.it/wiki/BIP_0044)).
-     * @param {BridgeOptions} options - The bridge's options.
-     * @param {BridgeConfig} [config] - If set, overrides the 'bridgeMaxFee' and 'paymasterToken' options defined in the manager configuration.
-     * @returns {Promise<BridgeResult>} The bridge's result.
-     */
-    bridge(blockchain: Blockchain, accountIndex: number, options: BridgeOptions, config?: BridgeConfig): Promise<BridgeResult>;
-    /**
-     * Quotes the costs of a bridge operation.
-     *
-     * @see {@link bridge}
-     * @param {Blockchain} blockchain - A blockchain identifier (e.g., "ethereum").
-     * @param {number} accountIndex - The index of the account to use (see [BIP-44](https://en.bitcoin.it/wiki/BIP_0044)).
-     * @param {BridgeOptions} options - The bridge's options.
-     * @param {BridgeConfig} [config] - If set, overrides the 'bridgeMaxFee' and 'paymasterToken' options defined in the manager configuration.
-     * @returns {Promise<Omit<BridgeResult, 'hash'>>} The bridge's quotes.
-     */
-    quoteBridge(blockchain: Blockchain, accountIndex: number, options: BridgeOptions, config?: BridgeConfig): Promise<Omit<BridgeResult, "hash">>;
-    #private;
+    _getWalletManager(blockchain: any): Promise<any>;
 }
-export type EvmWalletConfig = import("@wdk/wallet-evm").EvmWalletConfig;
-export type EvmAccountAbstractionConfig = import("@wdk/account-abstraction-evm").EvmAccountAbstractionConfig;
-export type TonWalletConfig = import("@wdk/wallet-ton").TonWalletConfig;
-export type TonAccountAbstractionConfig = import("@wdk/account-abstraction-ton").TonAccountAbstractionConfig;
-export type BtcWalletConfig = import("@wdk/wallet-btc").BtcWalletConfig;
-export type SparkWalletConfig = import("@wdk/wallet-spark").SparkWalletConfig;
-export type IWalletAccount = import("./wallet-account.js").default;
-export type Seeds = {
-    /**
-     * - The ethereum's wallet seed phrase.
-     */
-    ethereum: string;
-    /**
-     * - The arbitrum's wallet seed phrase.
-     */
-    arbitrum: string;
-    /**
-     * - The polygon's wallet seed phrase.
-     */
-    polygon: string;
-    /**
-     * - The ton's wallet seed phrase.
-     */
-    ton: string;
-    /**
-     * - The bitcoin's wallet seed phrase.
-     */
-    bitcoin: string;
-    /**
-     * - The spark's wallet seed phrase.
-     */
-    spark: string;
-};
-export type WdkConfig = {
-    /**
-     * - The ethereum blockchain configuration.
-     */
-    ethereum: EvmWalletConfig | EvmAccountAbstractionConfig;
-    /**
-     * - The arbitrum blockchain configuration.
-     */
-    arbitrum: EvmWalletConfig | EvmAccountAbstractionConfig;
-    /**
-     * - The polygon blockchain configuration.
-     */
-    polygon: EvmWalletConfig | EvmAccountAbstractionConfig;
-    /**
-     * - The ton blockchain configuration.
-     */
-    ton: TonWalletConfig | TonAccountAbstractionConfig;
-    /**
-     * - The bitcoin blockchain configuration.
-     */
-    bitcoin: BtcWalletConfig;
-    /**
-     * - The spark blockchain configuration.
-     */
-    spark: SparkWalletConfig;
-};
-export type TransferOptions = {
-    /**
-     * - The address of the recipient.
-     */
-    recipient: string;
-    /**
-     * - The address of the token to transfer.
-     */
-    token: string;
-    /**
-     * - The amount of tokens to transfer to the recipient (in base unit).
-     */
-    amount: number;
-};
-export type TransferConfig = {
-    /**
-     * - The maximum fee amount for transfer operations.
-     */
-    transferMaxFee?: number;
-    /**
-     * - The paymaster token configuration.
-     */
-    paymasterToken: {
-        address: string;
-    };
-};
-export type TransferResult = {
-    /**
-     * - The hash of the transfer operation.
-     */
-    hash: string;
-    /**
-     * - The gas cost in paymaster token.
-     */
-    gasCost: number;
-};
-export type SwapOptions = {
-    /**
-     * - The address of the token to sell.
-     */
-    tokenIn: string;
-    /**
-     * - The address of the token to buy.
-     */
-    tokenOut: string;
-    /**
-     * - The amount of input tokens to sell (in base unit).
-     */
-    tokenInAmount?: number;
-    /**
-     * - The amount of output tokens to buy (in base unit).
-     */
-    tokenOutAmount?: number;
-};
-export type SwapConfig = {
-    /**
-     * - The maximum fee amount for swap operations.
-     */
-    swapMaxFee?: number;
-    /**
-     * - The paymaster token configuration.
-     */
-    paymasterToken: {
-        address: string;
-    };
-};
-export type SwapResult = {
-    /**
-     * - The hash of the swap operation.
-     */
-    hash: string;
-    /**
-     * - The gas cost in paymaster token.
-     */
-    gasCost: number;
-    /**
-     * - The amount of input tokens sold.
-     */
-    tokenInAmount: number;
-    /**
-     * - The amount of output tokens bought.
-     */
-    tokenOutAmount: number;
-};
-export type BridgeOptions = {
-    /**
-     * - The identifier of the destination blockchain (e.g., "arbitrum").
-     */
-    targetChain: string;
-    /**
-     * - The address of the recipient.
-     */
-    recipient: string;
-    /**
-     * - The address of the token to bridge.
-     */
-    token: string;
-    /**
-     * - The amount of usdt tokens to bridge to the destination chain (in base unit).
-     */
-    amount: number;
-};
-export type BridgeConfig = {
-    /**
-     * - The maximum fee amount for bridge operations.
-     */
-    bridgeMaxFee?: number;
-    /**
-     * - The paymaster token configuration.
-     */
-    paymasterToken: {
-        address: string;
-    };
-};
-export type BridgeResult = {
-    /**
-     * - The hash of the bridge operation.
-     */
-    hash: string;
-    /**
-     * - The gas cost in paymaster token.
-     */
-    gasCost: number;
-    /**
-     * - The bridge cost in usdt tokens.
-     */
-    bridgeCost: number;
-};

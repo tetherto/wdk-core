@@ -208,7 +208,7 @@ export default class WdkManager {
       const seed = this._seed
       const config = this._config
 
-      const seedPhrase = typeof seed === 'string' ? seed : seed[blockchain]
+      const seedPhrase = typeof seed === 'string' ? seed : (seed[blockchain] || seed)
 
       if (EVM_BLOCKCHAINS.includes(blockchain)) {
         const { default: WalletManagerEvm } = await import('@wdk/wallet-evm-erc-4337')

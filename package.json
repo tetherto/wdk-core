@@ -13,7 +13,7 @@
   "dependencies": {
     "@wdk/wallet-evm-erc-4337": "https://github.com/vlad0k/wdk-wallet-evm-erc-4337#develop",
     "@wdk/wallet-ton-gasless": "https://github.com/AlonzoRicardo/wdk-wallet-ton-gasless#develop",
-    "@wdk/wallet-btc": "https://github.com/tetherto/wdk-wallet-btc#develop",
+    "@wdk/wallet-btc": "https://github.com/itsdeka/wdk-wallet-btc#useSeed",
     "@wdk/wallet-spark": "https://github.com/tetherto/wdk-wallet-spark#develop",
     "@wdk/wallet-tron": "https://github.com/itsdeka/wdk-wallet-tron-main-1",
     "@wdk/wallet": "https://github.com/tetherto/wdk-wallet#develop",

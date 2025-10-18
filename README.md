@@ -32,7 +32,7 @@
 ## How to Install
 
 ```bash
-npm install @tetherto/wdk
+npm install @tetherto/wdk @tetherto/wdk-wallet-evm @tetherto/wdk-wallet-tron @tetherto/wdk-wallet-btc
 ```
 
 ## Quick Start

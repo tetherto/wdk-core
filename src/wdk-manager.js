@@ -17,6 +17,7 @@
 import WalletManager from '@tetherto/wdk-wallet'
 
 import { SwapProtocol, BridgeProtocol, LendingProtocol } from '@tetherto/wdk-wallet/protocols'
+import { DualSignatureProtocol } from './protocols/dual-signature-protocol.js'
 
 /** @typedef {import('@tetherto/wdk-wallet').IWalletAccount} IWalletAccount */
 
@@ -45,7 +46,7 @@ export default class WDK {
     this._wallets = new Map()
 
     /** @private */
-    this._protocols = { swap: { }, bridge: { }, lending: { } }
+    this._protocols = { swap: { }, bridge: { }, lending: { }, dualSignature: { } }
 
     /** @private */
     this._middlewares = { }
@@ -98,7 +99,7 @@ export default class WDK {
    * same type bound to the same blockchain with the same label).
    *
    * @see {@link IWalletAccountWithProtocols#registerProtocol} to register protocols only for specific accounts.
-   * @template {typeof SwapProtocol | typeof BridgeProtocol | typeof LendingProtocol} P
+   * @template {typeof SwapProtocol | typeof BridgeProtocol | typeof LendingProtocol | typeof DualSignatureProtocol} P
    * @param {string} blockchain - The name of the blockchain the protocol must be bound to. Can be any string (e.g., "ethereum").
    * @param {string} label - The label.
    * @param {P} Protocol - The protocol class.
@@ -118,6 +119,10 @@ export default class WDK {
       this._protocols.lending[blockchain] ??= { }
 
       this._protocols.lending[blockchain][label] = { Protocol, config }
+    } else if (Protocol.prototype instanceof DualSignatureProtocol) {
+      this._protocols.dualSignature[blockchain] ??= { }
+
+      this._protocols.dualSignature[blockchain][label] = { Protocol, config }
     }
 
     return this
@@ -229,7 +234,7 @@ export default class WDK {
 
   /** @private */
   _registerProtocols (account, { blockchain }) {
-    const protocols = { swap: { }, bridge: { }, lending: { } }
+    const protocols = { swap: { }, bridge: { }, lending: { }, dualSignature: { } }
 
     account.registerProtocol = (label, Protocol, config) => {
       if (Protocol.prototype instanceof SwapProtocol) {
@@ -238,6 +243,8 @@ export default class WDK {
         protocols.bridge[label] = new Protocol(account, config)
       } else if (Protocol.prototype instanceof LendingProtocol) {
         protocols.lending[label] = new Protocol(account, config)
+      } else if (Protocol.prototype instanceof DualSignatureProtocol) {
+        protocols.dualSignature[label] = new Protocol(account, config)
       }
 
       return account
@@ -289,6 +296,22 @@ export default class WDK {
       }
 
       throw new Error(`No lending protocol registered for label: ${label}.`)
+    }
+
+    account.getDualSignatureProtocol = (label) => {
+      if (this._protocols.dualSignature[blockchain]?.[label]) {
+        const { Protocol, config } = this._protocols.dualSignature[blockchain][label]
+
+        const protocol = new Protocol(account, config)
+
+        return protocol
+      }
+
+      if (protocols.dualSignature[label]) {
+        return protocols.dualSignature[label]
+      }
+
+      throw new Error(`No dual signature protocol registered for label: ${label}.`)
     }
   }
 }

@@ -62,8 +62,8 @@ export class ECDSASigner {
     const recovery = signature.recovery
 
     return {
-      r: bytesToHex(signature.r.toString(16).padStart(64, '0')),
-      s: bytesToHex(signature.s.toString(16).padStart(64, '0')),
+      r: '0x' + signature.r.toString(16).padStart(64, '0'),
+      s: '0x' + signature.s.toString(16).padStart(64, '0'),
       v: recovery + 27, // Ethereum uses 27/28 instead of 0/1
       signature: signature.toCompactHex(),
       compact: signature.toCompactHex(),

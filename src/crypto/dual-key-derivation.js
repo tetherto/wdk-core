@@ -79,7 +79,7 @@ export class DualKeyDerivation {
     }
 
     // BIP-44 path: m/purpose'/coin_type'/account'/change/address
-    return `${pathConfig.PREFIX}'/${accountIndex}'/0/${addressIndex}`
+    return `${pathConfig.PREFIX}/${accountIndex}'/0/${addressIndex}`
   }
 
   /**

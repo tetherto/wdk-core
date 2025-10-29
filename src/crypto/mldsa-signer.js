@@ -72,7 +72,9 @@ export class MLDSASigner {
    * @private
    */
   _validateKeySizes() {
-    const expectedSizes = ML_DSA_LEVELS[this._algorithm]
+    // Convert algorithm name format (ML-DSA-65 -> ML_DSA_65)
+    const algorithmKey = this._algorithm.replace(/-/g, '_')
+    const expectedSizes = ML_DSA_LEVELS[algorithmKey]
     if (!expectedSizes) {
       throw new Error(`Unknown ML-DSA algorithm: ${this._algorithm}`)
     }
@@ -166,7 +168,8 @@ export class MLDSASigner {
     const combinedHash = sha3_256(new Uint8Array([...messageHash, ...seedHash, ...context]))
 
     // Expand to expected signature size using SHAKE256
-    const expectedSize = ML_DSA_LEVELS[this._algorithm].signatureSize
+    const algorithmKey = this._algorithm.replace(/-/g, '_')
+    const expectedSize = ML_DSA_LEVELS[algorithmKey].signatureSize
     const signature = shake256(combinedHash, { dkLen: expectedSize })
 
     return {
@@ -219,7 +222,8 @@ export class MLDSASigner {
       }
 
       // For placeholder, always return true if signature has correct size
-      const expectedSize = ML_DSA_LEVELS[this._algorithm].signatureSize
+      const algorithmKey = this._algorithm.replace(/-/g, '_')
+      const expectedSize = ML_DSA_LEVELS[algorithmKey].signatureSize
       return sigBytes.length === expectedSize
     } catch (error) {
       return false
@@ -327,7 +331,8 @@ export class MLDSASigner {
    * @returns {Object} Signer info
    */
   getInfo() {
-    const sizes = ML_DSA_LEVELS[this._algorithm]
+    const algorithmKey = this._algorithm.replace(/-/g, '_')
+    const sizes = ML_DSA_LEVELS[algorithmKey]
 
     return {
       type: 'ML-DSA',
@@ -359,7 +364,8 @@ export class MLDSASigner {
    * @returns {number} Expected signature size in bytes
    */
   getSignatureSize() {
-    return ML_DSA_LEVELS[this._algorithm].signatureSize
+    const algorithmKey = this._algorithm.replace(/-/g, '_')
+    return ML_DSA_LEVELS[algorithmKey].signatureSize
   }
 
   /**

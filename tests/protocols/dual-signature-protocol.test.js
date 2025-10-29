@@ -403,7 +403,8 @@ describe('DualSignatureProtocol', () => {
     })
 
     test('should use provided seed', async () => {
-      const customSeed = 'custom seed phrase twelve words long enough for testing purpose only'
+      // Use a valid BIP-39 mnemonic for testing
+      const customSeed = 'zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong'
       const customProtocol = new DualSignatureProtocol(account, {
         seed: customSeed
       })

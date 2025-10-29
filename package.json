@@ -23,12 +23,13 @@
     "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage"
   },
   "dependencies": {
-    "@tetherto/wdk-wallet": "^1.0.0-beta.1",
-    "bare-wdk-runtime": "2.0.0",
     "@noble/curves": "^1.3.0",
     "@noble/hashes": "^1.3.3",
+    "@noble/post-quantum": "^0.5.2",
     "@scure/bip32": "^1.3.3",
-    "@scure/bip39": "^1.2.2"
+    "@scure/bip39": "^1.2.2",
+    "@tetherto/wdk-wallet": "^1.0.0-beta.1",
+    "bare-wdk-runtime": "2.0.0"
   },
   "devDependencies": {
     "cross-env": "7.0.3",

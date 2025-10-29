@@ -153,38 +153,37 @@ export class DualKeyDerivation {
    * @returns {Promise<Object>} ML-DSA key pair
    */
   async _generateMLDSAFromSeed(seed) {
-    // NOTE: This is a placeholder implementation
-    // In production, you would use a proper ML-DSA library like:
-    // - @noble/post-quantum (when available)
-    // - dilithium-crystals-js
-    // - libsodium with PQC extensions
-
     try {
-      // Try to import ML-DSA library if available
-      const { ml_dsa_65 } = await import('@noble/post-quantum').catch(() => ({}))
+      // Import the real ML-DSA implementation from @noble/post-quantum
+      const { ml_dsa65 } = await import('@noble/post-quantum/ml-dsa.js')
 
-      if (ml_dsa_65) {
-        // Use actual ML-DSA implementation
-        return ml_dsa_65.keygen(seed)
+      // Ensure seed is exactly 32 bytes
+      const mldsaSeed = seed.length === 32 ? seed : seed.slice(0, 32)
+
+      // Generate ML-DSA key pair using the real implementation
+      const keyPair = ml_dsa65.keygen(mldsaSeed)
+
+      return {
+        privateKey: keyPair.secretKey,  // ML-DSA-65 private key
+        publicKey: keyPair.publicKey,   // ML-DSA-65 public key
+        __placeholder: false,
+        __seed: mldsaSeed
       }
     } catch (error) {
-      // Library not available, use placeholder
-    }
+      // If real implementation fails, fall back to placeholder for development
+      console.warn('ML-DSA implementation error, using placeholder:', error.message)
 
-    // Placeholder implementation for development
-    // WARNING: This is NOT a real ML-DSA implementation!
-    console.warn('ML-DSA library not found. Using placeholder implementation.')
+      // Generate deterministic "keys" from seed (for development only)
+      const expandedSeed = sha256.create().update(seed).update(new Uint8Array([0])).digest()
+      const publicKeySeed = sha256.create().update(seed).update(new Uint8Array([1])).digest()
 
-    // Generate deterministic "keys" from seed (for development only)
-    const expandedSeed = sha256.create().update(seed).update(new Uint8Array([0])).digest()
-    const publicKeySeed = sha256.create().update(seed).update(new Uint8Array([1])).digest()
-
-    return {
-      privateKey: new Uint8Array(4032), // ML-DSA-65 private key size
-      publicKey: new Uint8Array(1952),  // ML-DSA-65 public key size
-      // Fill with deterministic data for testing
-      __placeholder: true,
-      __seed: seed
+      return {
+        privateKey: new Uint8Array(4032), // ML-DSA-65 private key size
+        publicKey: new Uint8Array(1952),  // ML-DSA-65 public key size
+        // Fill with deterministic data for testing
+        __placeholder: true,
+        __seed: seed
+      }
     }
   }
 

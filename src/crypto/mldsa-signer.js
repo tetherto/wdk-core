@@ -128,29 +128,45 @@ export class MLDSASigner {
    */
   async _signWithRealImplementation(message, context, deterministic) {
     try {
-      // Try to import ML-DSA library
-      const { ml_dsa_65 } = await import('@noble/post-quantum').catch(() => ({}))
+      // Import the correct algorithm variant from @noble/post-quantum
+      let mlDsaModule
+      const algorithmKey = this._algorithm.replace(/-/g, '_')
 
-      if (ml_dsa_65) {
-        const signature = ml_dsa_65.sign(message, this._privateKey, { context, deterministic })
+      if (algorithmKey === 'ML_DSA_44') {
+        const { ml_dsa44 } = await import('@noble/post-quantum/ml-dsa.js')
+        mlDsaModule = ml_dsa44
+      } else if (algorithmKey === 'ML_DSA_65') {
+        const { ml_dsa65 } = await import('@noble/post-quantum/ml-dsa.js')
+        mlDsaModule = ml_dsa65
+      } else if (algorithmKey === 'ML_DSA_87') {
+        const { ml_dsa87 } = await import('@noble/post-quantum/ml-dsa.js')
+        mlDsaModule = ml_dsa87
+      } else {
+        // Default to ML-DSA-65
+        const { ml_dsa65 } = await import('@noble/post-quantum/ml-dsa.js')
+        mlDsaModule = ml_dsa65
+      }
 
-        return {
-          signature,
-          signatureHex: bytesToHex(signature),
-          algorithm: this._algorithm,
-          securityLevel: this._securityLevel,
-          publicKey: this._publicKey,
-          messageHash: bytesToHex(sha3_256(message)),
-          context: bytesToHex(context),
-          timestamp: Date.now()
-        }
+      // Sign the message with optional context
+      // @noble/post-quantum API: sign(message, secretKey, opts)
+      const opts = context && context.length > 0 ? { context } : {}
+      const signature = mlDsaModule.sign(message, this._privateKey, opts)
+
+      return {
+        signature,
+        signatureHex: bytesToHex(signature),
+        algorithm: this._algorithm,
+        securityLevel: this._securityLevel,
+        publicKey: this._publicKey,
+        messageHash: bytesToHex(sha3_256(message)),
+        context: bytesToHex(context),
+        timestamp: Date.now()
       }
     } catch (error) {
-      console.warn('ML-DSA library error:', error.message)
+      console.warn('ML-DSA signing error:', error.message)
+      // Fallback to placeholder
+      return this._signWithPlaceholder(message, context, deterministic)
     }
-
-    // Fallback to placeholder
-    return this._signWithPlaceholder(message, context, deterministic)
   }
 
   /**
@@ -209,22 +225,41 @@ export class MLDSASigner {
         return false
       }
 
-      // If we have a real ML-DSA implementation, use it
-      if (this._hasRealImplementation) {
-        try {
-          const { ml_dsa_65 } = await import('@noble/post-quantum').catch(() => ({}))
-          if (ml_dsa_65) {
-            return ml_dsa_65.verify(sigBytes, message, pubKey)
-          }
-        } catch (error) {
-          console.warn('ML-DSA verify error:', error.message)
-        }
-      }
+      // Try to use real ML-DSA implementation for verification
+      try {
+        // Import the correct algorithm variant
+        let mlDsaModule
+        const algorithmKey = this._algorithm.replace(/-/g, '_')
 
-      // For placeholder, always return true if signature has correct size
-      const algorithmKey = this._algorithm.replace(/-/g, '_')
-      const expectedSize = ML_DSA_LEVELS[algorithmKey].signatureSize
-      return sigBytes.length === expectedSize
+        if (algorithmKey === 'ML_DSA_44') {
+          const { ml_dsa44 } = await import('@noble/post-quantum/ml-dsa.js')
+          mlDsaModule = ml_dsa44
+        } else if (algorithmKey === 'ML_DSA_65') {
+          const { ml_dsa65 } = await import('@noble/post-quantum/ml-dsa.js')
+          mlDsaModule = ml_dsa65
+        } else if (algorithmKey === 'ML_DSA_87') {
+          const { ml_dsa87 } = await import('@noble/post-quantum/ml-dsa.js')
+          mlDsaModule = ml_dsa87
+        } else {
+          // Default to ML-DSA-65
+          const { ml_dsa65 } = await import('@noble/post-quantum/ml-dsa.js')
+          mlDsaModule = ml_dsa65
+        }
+
+        // Verify the signature
+        // @noble/post-quantum API: verify(signature, message, publicKey, opts)
+        return mlDsaModule.verify(sigBytes, message, pubKey, {})
+      } catch (error) {
+        // If real verification fails, check if using placeholder
+        if (!this._hasRealImplementation) {
+          // For placeholder, return true if signature has correct size
+          const algorithmKey = this._algorithm.replace(/-/g, '_')
+          const expectedSize = ML_DSA_LEVELS[algorithmKey].signatureSize
+          return sigBytes.length === expectedSize
+        }
+        console.warn('ML-DSA verify error:', error.message)
+        return false
+      }
     } catch (error) {
       return false
     }

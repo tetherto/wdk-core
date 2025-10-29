@@ -119,7 +119,7 @@ export default class WDK {
       this._protocols.lending[blockchain] ??= { }
 
       this._protocols.lending[blockchain][label] = { Protocol, config }
-    } else if (Protocol.prototype instanceof DualSignatureProtocol) {
+    } else if (Protocol === DualSignatureProtocol || Protocol.prototype instanceof DualSignatureProtocol) {
       this._protocols.dualSignature[blockchain] ??= { }
 
       this._protocols.dualSignature[blockchain][label] = { Protocol, config }
@@ -243,7 +243,7 @@ export default class WDK {
         protocols.bridge[label] = new Protocol(account, config)
       } else if (Protocol.prototype instanceof LendingProtocol) {
         protocols.lending[label] = new Protocol(account, config)
-      } else if (Protocol.prototype instanceof DualSignatureProtocol) {
+      } else if (Protocol === DualSignatureProtocol || Protocol.prototype instanceof DualSignatureProtocol) {
         protocols.dualSignature[label] = new Protocol(account, config)
       }
 

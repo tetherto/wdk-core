@@ -44,14 +44,14 @@ export default class WdkManager {
      * same type bound to the same blockchain with the same label).
      *
      * @see {@link IWalletAccountWithProtocols#registerProtocol} to register protocols only for specific accounts.
-     * @template {typeof SwapProtocol | typeof BridgeProtocol | typeof LendingProtocol} P
+     * @template {typeof SwapProtocol | typeof BridgeProtocol | typeof LendingProtocol | typeof FiatProtocol} P
      * @param {string} blockchain - The name of the blockchain the protocol must be bound to. Can be any string (e.g., "ethereum").
      * @param {string} label - The label.
      * @param {P} Protocol - The protocol class.
      * @param {ConstructorParameters<P>[1]} config - The protocol configuration.
      * @returns {WdkManager} The wdk manager.
      */
-    registerProtocol<P extends typeof SwapProtocol | typeof BridgeProtocol | typeof LendingProtocol>(blockchain: string, label: string, Protocol: P, config: ConstructorParameters<P>[1]): WdkManager;
+    registerProtocol<P extends typeof SwapProtocol | typeof BridgeProtocol | typeof LendingProtocol | typeof FiatProtocol>(blockchain: string, label: string, Protocol: P, config: ConstructorParameters<P>[1]): WDK;
     /**
      * Registers a new middleware to the wdk manager.
      *
@@ -105,3 +105,4 @@ import WalletManager from "@tetherto/wdk-wallet";
 import { SwapProtocol } from "@tetherto/wdk-wallet/protocols";
 import { BridgeProtocol } from "@tetherto/wdk-wallet/protocols";
 import { LendingProtocol } from "@tetherto/wdk-wallet/protocols";
+import { FiatProtocol } from "@tetherto/wdk-wallet/protocols";

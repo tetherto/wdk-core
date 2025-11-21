@@ -22,6 +22,8 @@ import { IWalletAccount, NotImplementedError } from '@tetherto/wdk-wallet'
 
 /** @typedef {import('@tetherto/wdk-wallet/protocols').ILendingProtocol} ILendingProtocol */
 
+/** @typedef {import('@tetherto/wdk-wallet/protocols').IFiatProtocol} IFiatProtocol */
+
 /** @interface */
 export class IWalletAccountWithProtocols extends IWalletAccount {
   /**
@@ -30,7 +32,7 @@ export class IWalletAccountWithProtocols extends IWalletAccount {
    * The label must be unique in the scope of the account and the type of protocol (i.e., there can’t be two protocols of the same
    * type bound to the same account with the same label).
    *
-   * @template {typeof SwapProtocol | typeof BridgeProtocol | typeof LendingProtocol} P
+   * @template {typeof SwapProtocol | typeof BridgeProtocol | typeof LendingProtocol | typeof FiatProtocol} P
    * @param {string} label - The label.
    * @param {P} Protocol - The protocol class.
    * @param {ConstructorParameters<P>[1]} config - The protocol configuration.
@@ -71,5 +73,16 @@ export class IWalletAccountWithProtocols extends IWalletAccount {
    */
   getLendingProtocol (label) {
     throw new NotImplementedError('getLendingProtocol(label)')
+  }
+
+  /**
+   * Returns the fiat protocol with the given label.
+   *
+   * @param {string} label - The label.
+   * @returns {IFiatProtocol} The fiat protocol.
+   * @throws {Error} If no fiat protocol has been registered on this account with the given label.
+   */
+  getFiatProtocol (label) {
+    throw new NotImplementedError('getFiatProtocol(label)')
   }
 }
